@@ -49,7 +49,7 @@ app.get('/api/hello', (req, res) => {
  * - Validates required fields (email, username, password)
  * - Hashes password securely using Argon2
  * - Stores user in the database
- * - Returns user info (excluding password)
+ * - Returns user username and email
  */
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
