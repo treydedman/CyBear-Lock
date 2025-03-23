@@ -38,8 +38,8 @@ export function RegistrationForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-sm bg-white p-8 rounded-2xl shadow-lg">
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-sm sm:max-w-sm md:max-w-sm lg:max-w-sm bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
         <h2 className="text-3xl font-semibold text-center text-blue-950">
           Sign Up
         </h2>
