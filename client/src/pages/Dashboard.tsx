@@ -2,12 +2,12 @@ import { useContext, useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import { UserContext } from '../components/UserContext';
 import { readToken } from '../lib/data';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 type PasswordEntry = {
   website: string;
   accountUsername: string;
-  category: string;
-  tags: string[];
+  password?: string; // Decrypted password
 };
 
 export default function Dashboard() {
@@ -15,13 +15,15 @@ export default function Dashboard() {
   const [entries, setEntries] = useState<PasswordEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [visiblePasswords, setVisiblePasswords] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useEffect(() => {
     async function fetchEntries() {
       try {
         setIsLoading(true);
         const token = readToken();
-        console.log('Token:', token);
 
         if (!token) {
           setError('Authentication failed: No token found.');
@@ -41,7 +43,6 @@ export default function Dashboard() {
         }
 
         const entries = await response.json();
-        console.log('Fetched Entries:', entries);
         setEntries(entries);
       } catch (e) {
         console.error('Failed to fetch entries:', e);
@@ -53,6 +54,47 @@ export default function Dashboard() {
 
     fetchEntries();
   }, []);
+
+  async function fetchDecryptedPassword(
+    website: string,
+    accountUsername: string
+  ) {
+    try {
+      const token = readToken();
+      const response = await fetch(
+        `/api/passwords/${website}/${accountUsername}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const { password } = await response.json();
+      setEntries((prev) =>
+        prev.map((entry) =>
+          entry.website === website && entry.accountUsername === accountUsername
+            ? { ...entry, password }
+            : entry
+        )
+      );
+    } catch (e) {
+      console.error('Failed to fetch password:', e);
+    }
+  }
+
+  function togglePasswordVisibility(entryKey: string) {
+    setVisiblePasswords((prev) => ({
+      ...prev,
+      [entryKey]: !prev[entryKey],
+    }));
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-800">
@@ -73,32 +115,44 @@ export default function Dashboard() {
         {!isLoading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {entries.length > 0 ? (
-              entries.map((entry) => (
-                <div
-                  key={entry.website + entry.accountUsername}
-                  className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md border dark:border-gray-700">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {entry.website}
-                  </h2>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    Username: {entry.accountUsername}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    Category: {entry.category}
-                  </p>
-                  {entry.tags.length > 0 && (
-                    <div className="mt-2 flex flex-wrap">
-                      {entry.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full mr-2">
-                          {tag}
+              entries.map((entry) => {
+                const entryKey = `${entry.website}-${entry.accountUsername}`;
+                return (
+                  <div
+                    key={entryKey}
+                    className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md border dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {entry.website}
+                    </h2>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      Username: {entry.accountUsername}
+                    </p>
+
+                    <div className="mt-2 flex items-center">
+                      <button
+                        onClick={() => {
+                          if (!entry.password) {
+                            fetchDecryptedPassword(
+                              entry.website,
+                              entry.accountUsername
+                            );
+                          }
+                          togglePasswordVisibility(entryKey);
+                        }}
+                        className="text-blue-500 hover:underline">
+                        {visiblePasswords[entryKey]
+                          ? 'Hide Password'
+                          : 'Show Password'}
+                      </button>
+                      {entry.password && visiblePasswords[entryKey] && (
+                        <span className="ml-2 text-gray-900 dark:text-white">
+                          {entry.password}
                         </span>
-                      ))}
+                      )}
                     </div>
-                  )}
-                </div>
-              ))
+                  </div>
+                );
+              })
             ) : (
               <p className="text-gray-500 dark:text-gray-400">
                 No password entries found.

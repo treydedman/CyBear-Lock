@@ -149,7 +149,7 @@ app.get(
       const sql = `
       select "userId", "website", "accountUsername", "encryptedPassword"
       from "passwordEntries"
-      where "userId" = $1 and "website" = $2 and "account_username" = $3
+      where "userId" = $1 and "website" = $2 and "accountUsername" = $3
       limit 1;
     `;
 
