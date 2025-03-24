@@ -2,13 +2,13 @@
 import 'dotenv/config';
 import express from 'express';
 import pg from 'pg';
-import { ClientError, errorMiddleware, authMiddleware } from './lib/index.js';
+import { ClientError, errorMiddleware, authMiddleware } from './lib/index';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
-import { encrypt, decrypt } from './lib/cipher.js';
+import { encrypt, decrypt } from './lib/cipher';
 
 type User = {
-  id: number;
+  userId: number;
   email: string;
   username: string;
   hashedPassword: string;
@@ -59,7 +59,7 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
       throw new ClientError(400, 'Email, username and password are required');
     }
 
-    const encryptedPassword = encrypt(password);
+    const hashedPassword = await argon2.hash(password);
 
     const sql = `
     insert into "users" ("email", "username", "hashedPassword")
@@ -67,7 +67,7 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
     returning "userId", "email", "username", "createdAt";
     `;
 
-    const params = [email, username, encryptedPassword];
+    const params = [email, username, hashedPassword];
     const result = await db.query<User>(sql, params);
 
     res.status(201).json({
@@ -87,36 +87,36 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
  */
 app.post('/api/auth/sign-in', async (req, res, next) => {
   try {
-    const { email, username, password } = req.body;
-    if ((!email && !username) || !password) {
-      throw new ClientError(
-        400,
-        'email or username and the password are required'
-      );
+    const { identifier, password } = req.body; // Accepts either email or username
+
+    if (!identifier || !password) {
+      throw new ClientError(400, 'Email or username and password are required');
     }
 
     const sql = `
-    select "userId", "email", "username", "hashedPassword"
-    from "users"
-    where "email" = $1 or "username" = $2;
+    SELECT "userId", "email", "username", "hashedPassword"
+    FROM "users"
+    WHERE COALESCE("email" = $1, false) OR COALESCE("username" = $1, false);
     `;
 
-    const params = [email, username];
+    const params = [identifier];
     const result = await db.query<User>(sql, params);
     const user = result.rows[0];
 
-    if (!user) throw new ClientError(401, 'invalid email or username');
-
-    try {
-      const decryptedPassword = decrypt(user.hashedPassword);
-      if (decryptedPassword !== password) {
-        throw new ClientError(401, 'Invalid password');
-      }
-    } catch (error) {
-      throw new ClientError(500, 'Error decrypting password');
+    if (!user) {
+      throw new ClientError(401, 'Invalid email or username');
     }
 
-    const payload = { id: user.id, email: user.email, username: user.username };
+    const isValidPassword = await argon2.verify(user.hashedPassword, password);
+    if (!isValidPassword) {
+      throw new ClientError(401, 'Invalid password');
+    }
+
+    const payload = {
+      userId: user.userId,
+      email: user.email,
+      username: user.username,
+    };
     const token = jwt.sign(payload, hashKey);
 
     res.status(200).json({ token, user: payload });
@@ -148,7 +148,7 @@ app.get(
 
       const sql = `
       select "userId", "website", "accountUsername", "encryptedPassword"
-      from "password_entries"
+      from "passwordEntries"
       where "userId" = $1 and "website" = $2 and "account_username" = $3
       limit 1;
     `;
@@ -173,12 +173,13 @@ app.get(
 );
 
 app.post('/api/passwords', authMiddleware, async (req, res, next) => {
+  console.log('/api/password-post');
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) throw new ClientError(401, 'authentication required');
-
-    const { website, accountUsername, password } = req.body;
-    if (!website || !accountUsername || !password) {
+    console.log('req.body', req.body);
+    const { website, username, password } = req.body;
+    if (!website || !username || !password) {
       throw new ClientError(400, 'credentials are required');
     }
 
@@ -190,10 +191,34 @@ app.post('/api/passwords', authMiddleware, async (req, res, next) => {
     returning "website", "accountUsername", "createdAt";
     `;
 
-    const params = [userId, website, accountUsername, encryptedPassword];
+    const params = [userId, website, username, encryptedPassword];
     const result = await db.query(sql, params);
 
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/api/passwords', authMiddleware, async (req, res, next) => {
+  try {
+    console.log('api password hit');
+    const userId = req.user?.userId;
+    console.log('user', req.user);
+    if (!userId) throw new ClientError(401, 'Authentication required');
+
+    const sql = `
+      select "website", "accountUsername", "encryptedPassword", "category", "tags", "createdAt"
+      from "passwordEntries"
+      where "userId" = $1
+      order by "website" asc, "accountUsername" asc;
+    `;
+
+    const params = [userId];
+    console.log('user', [userId]);
+    const result = await db.query(sql, params);
+    console.log('result', result);
+    res.status(200).json(result.rows);
   } catch (err) {
     next(err);
   }

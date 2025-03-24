@@ -49,16 +49,7 @@ export function RegistrationForm() {
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col space-y-6">
-          <div>
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 block text-sm"
-            />
-          </div>
-
+          {/* Moved Email to the Top */}
           <div>
             <input
               type="email"
@@ -69,6 +60,18 @@ export function RegistrationForm() {
             />
           </div>
 
+          {/* Username in the Middle */}
+          <div>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 block text-sm"
+            />
+          </div>
+
+          {/* Password at the Bottom */}
           <div>
             <input
               type="password"

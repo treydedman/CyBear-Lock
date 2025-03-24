@@ -8,7 +8,7 @@ type AuthData = {
 };
 
 /**
- * Form that signs in a user.
+ * Form to sign in a user
  */
 export function SignInForm() {
   const { handleSignIn } = useUser();
@@ -40,6 +40,7 @@ export function SignInForm() {
       setIsLoading(false);
     }
   }
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-sm sm:max-w-sm md:max-w-sm lg:max-w-sm bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
@@ -55,7 +56,7 @@ export function SignInForm() {
           <div>
             <input
               type="text"
-              name="username"
+              name="identifier"
               placeholder="Email or Username"
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
