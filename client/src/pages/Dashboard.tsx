@@ -7,7 +7,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 type PasswordEntry = {
   website: string;
   accountUsername: string;
-  password?: string; // Decrypted password
+  password?: string;
 };
 
 export default function Dashboard() {
@@ -101,7 +101,7 @@ export default function Dashboard() {
       <Sidebar />
 
       <div className="flex-1 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-200 mb-6">
           {`Good ${new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, ${
             user?.username || 'User'
           }`}
@@ -117,18 +117,25 @@ export default function Dashboard() {
             {entries.length > 0 ? (
               entries.map((entry) => {
                 const entryKey = `${entry.website}-${entry.accountUsername}`;
+                const isVisible = visiblePasswords[entryKey];
+
                 return (
                   <div
                     key={entryKey}
-                    className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md border dark:border-gray-700">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[300px]">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                       {entry.website}
                     </h2>
-                    <p className="text-gray-700 dark:text-gray-300">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
                       Username: {entry.accountUsername}
                     </p>
 
-                    <div className="mt-2 flex items-center">
+                    <div className="mt-2 flex items-center justify-between bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded-md">
+                      <span className="text-gray-900 dark:text-white font-mono truncate">
+                        {entry.password && isVisible
+                          ? entry.password
+                          : '••••••••'}
+                      </span>
                       <button
                         onClick={() => {
                           if (!entry.password) {
@@ -139,16 +146,13 @@ export default function Dashboard() {
                           }
                           togglePasswordVisibility(entryKey);
                         }}
-                        className="text-blue-500 hover:underline">
-                        {visiblePasswords[entryKey]
-                          ? 'Hide Password'
-                          : 'Show Password'}
+                        className="text-gray-600 dark:text-gray-300 hover:text-teal-500">
+                        {isVisible ? (
+                          <FaEyeSlash size={18} />
+                        ) : (
+                          <FaEye size={18} />
+                        )}
                       </button>
-                      {entry.password && visiblePasswords[entryKey] && (
-                        <span className="ml-2 text-gray-900 dark:text-white">
-                          {entry.password}
-                        </span>
-                      )}
                     </div>
                   </div>
                 );
