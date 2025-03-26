@@ -3,19 +3,23 @@ import Sidebar from '../components/Sidebar';
 import { UserContext } from '../components/UserContext';
 import { readToken } from '../lib/data';
 import { FaEye, FaEyeSlash, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
+import Modal from '../components/Modal';
 
 type PasswordEntry = {
   entryId: number;
   website: string;
   accountUsername: string;
   encryptedPassword: string;
+  password: string;
   category: string | null;
   tags: string | null;
 };
 
 export default function Dashboard() {
+  // console.log('component loaded');
   const { user } = useContext(UserContext);
   const [entries, setEntries] = useState<PasswordEntry[]>([]);
+  // console.log('entries', entries);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<{
@@ -23,40 +27,41 @@ export default function Dashboard() {
   }>({});
   const [editEntry, setEditEntry] = useState<PasswordEntry | null>(null);
   const [newPassword, setNewPassword] = useState<string>('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
+
+  const fetchEntries = async () => {
+    try {
+      setIsLoading(true);
+      const token = readToken();
+      if (!token) {
+        setError('Authentication failed: No token found.');
+        return;
+      }
+      const res = await fetch('/api/passwords', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+      const entries = await res.json();
+      setEntries(entries);
+
+      // Reset visiblePasswords explicitly after fetch
+      setVisiblePasswords({});
+    } catch (e) {
+      console.error('Failed to fetch entries:', e);
+      setError(e instanceof Error ? e.message : 'Unknown error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchEntries() {
-      try {
-        setIsLoading(true);
-        const token = readToken();
-
-        if (!token) {
-          setError('Authentication failed: No token found.');
-          return;
-        }
-
-        const res = await fetch('/api/passwords', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error(`Error ${res.status}: ${res.statusText}`);
-        }
-
-        const entries = await res.json();
-        setEntries(entries);
-      } catch (e) {
-        console.error('Failed to fetch entries:', e);
-        setError(e instanceof Error ? e.message : 'Unknown error');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchEntries();
   }, []);
 
@@ -122,13 +127,27 @@ export default function Dashboard() {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
-      setEntries((prevEntries) =>
-        prevEntries.filter((entry) => entry.entryId !== entryId)
-      );
+      alert('Password entry deleted successfully');
+      await fetchEntries(); // Re-fetch entries after deleting
+
+      // Close the modal and clear entryToDelete
+      setIsModalVisible(false);
+      setEntryToDelete(null);
     } catch (error) {
-      console.error('Failed to delete password:', error);
-      alert(`Failed to delete password: ${error.message}`);
+      console.error('Failed to delete password entry:', error);
+      alert(`Failed to delete password entry: ${error.message}`);
     }
+  };
+
+  // Trigger delete with confirmation modal
+  const handleDeleteClick = (entryId: number) => {
+    setEntryToDelete(entryId); // Store entryId to delete
+    setIsModalVisible(true); // Show the modal to confirm deletion
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false); // Close modal if cancelled
+    setEntryToDelete(null); // Clear the entry ID
   };
 
   const handleUpdate = async (
@@ -137,19 +156,12 @@ export default function Dashboard() {
   ) => {
     try {
       if (!entryId || !newPassword) {
-        console.error('Invalid entryId or newPassword:', {
-          entryId,
-          newPassword,
-        });
         throw new Error('Invalid entryId or newPassword');
       }
-
       const token = readToken();
-
       if (!token) {
         throw new Error('Authentication token missing');
       }
-
       const response = await fetch(`/api/passwords/${entryId}`, {
         method: 'PUT',
         headers: {
@@ -158,7 +170,6 @@ export default function Dashboard() {
         },
         body: JSON.stringify({ password: newPassword }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
@@ -168,21 +179,25 @@ export default function Dashboard() {
         );
       }
 
-      const updatedPassword = await response.json();
-
-      // trying to re-render immediately
-      setEntries((prevEntries) => {
-        return prevEntries.map((entry) => {
-          if (entry.entryId === updatedPassword.entryId) {
-            return { ...entry, password: updatedPassword.password };
-          }
-          return entry;
-        });
-      });
-
       alert('Password updated successfully');
-
       setEditEntry(null);
+      setNewPassword('');
+
+      // After updating, re-fetch entries
+      await fetchEntries();
+
+      // Immediately set visibility to true for updated entry
+      const updatedEntry = entries.find((entry) => entry.entryId === entryId);
+      if (updatedEntry) {
+        const entryKey = `${updatedEntry.website}-${updatedEntry.accountUsername}`;
+        setVisiblePasswords({ [entryKey]: true });
+
+        // Re-fetch decrypted password immediately to prevent extra clicks
+        await fetchDecryptedPassword(
+          updatedEntry.website,
+          updatedEntry.accountUsername
+        );
+      }
     } catch (error) {
       console.error('Failed to update password:', error);
       alert(`Failed to update password: ${error.message}`);
@@ -195,7 +210,7 @@ export default function Dashboard() {
 
       <div className="flex-1 p-6">
         <h1 className="text-2xl font-medium text-gray-900 dark:text-gray-200 mb-6">
-          {`Good ${new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, ${
+          {`Good ${new Date().getHours() < 12 ? 'morning' : 'afternoon'}, ${
             user?.username || 'User'
           }`}
         </h1>
@@ -283,7 +298,7 @@ export default function Dashboard() {
                               <FaPencilAlt size={20} />
                             </button>
                             <button
-                              onClick={() => handleDelete(entry.entryId)}
+                              onClick={() => handleDeleteClick(entry.entryId)}
                               className="text-red-400 hover:text-red-500 text-sm">
                               <FaTrashAlt size={20} />
                             </button>
@@ -302,6 +317,14 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      {/* Modal */}
+      {isModalVisible && (
+        <Modal
+          isVisible={isModalVisible}
+          onClose={handleCloseModal}
+          onConfirm={() => entryToDelete && handleDelete(entryToDelete)}
+        />
+      )}
     </div>
   );
 }
