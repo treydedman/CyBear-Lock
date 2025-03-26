@@ -1,5 +1,4 @@
-import { useState, useContext } from 'react';
-import { UserContext } from '../components/UserContext';
+import { useState } from 'react';
 import { readToken } from '../lib/data';
 
 export default function NewPasswordForm({
@@ -25,9 +24,7 @@ export default function NewPasswordForm({
     setError(null);
 
     try {
-      // const token = localStorage.getItem('token');
       const token = readToken();
-      console.log('new password form token', token);
 
       if (!token) throw new Error('User is not authenticated');
 

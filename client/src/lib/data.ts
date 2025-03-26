@@ -14,7 +14,7 @@ export type UnsavedPassword = {
 };
 
 export type Password = UnsavedPassword & {
-  passwordId: number;
+  entryId: number;
 };
 
 // Save user authentication details
@@ -83,6 +83,10 @@ export async function updatePassword(password: Password): Promise<Password> {
   const token = readToken();
   if (!token) throw new Error('No authentication token found');
 
+  if (!password.entryId) {
+    throw new Error('Password entry ID is missing');
+  }
+
   const req = {
     method: 'PUT',
     headers: {
@@ -91,8 +95,11 @@ export async function updatePassword(password: Password): Promise<Password> {
     },
     body: JSON.stringify(password),
   };
-  const res = await fetch(`/api/passwords/${password.passwordId}`, req);
+
+  const res = await fetch(`/api/passwords/${password.entryId}`, req);
+
   if (!res.ok) throw new Error(`fetch Error ${res.status}`);
+
   return (await res.json()) as Password;
 }
 

@@ -10,11 +10,12 @@ const Header = () => {
 
   useEffect(() => {
     if (darkMode) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
+      document.body.style.backgroundColor = 'black';
+      // document.body.classList.remove('light');
       localStorage.setItem('theme', 'dark');
     } else {
-      document.documentElement.classList.add('light');
+      document.body.style.backgroundColor = 'white';
+      // document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }

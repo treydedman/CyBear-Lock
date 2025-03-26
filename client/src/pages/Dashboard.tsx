@@ -2,12 +2,15 @@ import { useContext, useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import { UserContext } from '../components/UserContext';
 import { readToken } from '../lib/data';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 
 type PasswordEntry = {
+  entryId: number;
   website: string;
   accountUsername: string;
-  password?: string;
+  encryptedPassword: string;
+  category: string | null;
+  tags: string | null;
 };
 
 export default function Dashboard() {
@@ -18,6 +21,8 @@ export default function Dashboard() {
   const [visiblePasswords, setVisiblePasswords] = useState<{
     [key: string]: boolean;
   }>({});
+  const [editEntry, setEditEntry] = useState<PasswordEntry | null>(null);
+  const [newPassword, setNewPassword] = useState<string>('');
 
   useEffect(() => {
     async function fetchEntries() {
@@ -30,7 +35,7 @@ export default function Dashboard() {
           return;
         }
 
-        const response = await fetch('/api/passwords', {
+        const res = await fetch('/api/passwords', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -38,11 +43,11 @@ export default function Dashboard() {
           },
         });
 
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
         }
 
-        const entries = await response.json();
+        const entries = await res.json();
         setEntries(entries);
       } catch (e) {
         console.error('Failed to fetch entries:', e);
@@ -61,22 +66,19 @@ export default function Dashboard() {
   ) {
     try {
       const token = readToken();
-      const response = await fetch(
-        `/api/passwords/${website}/${accountUsername}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`/api/passwords/${website}/${accountUsername}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
 
-      const { password } = await response.json();
+      const { password } = await res.json();
       setEntries((prev) =>
         prev.map((entry) =>
           entry.website === website && entry.accountUsername === accountUsername
@@ -96,12 +98,103 @@ export default function Dashboard() {
     }));
   }
 
+  const handleDelete = async (entryId: number | undefined) => {
+    try {
+      if (!entryId) {
+        console.error('Invalid entry ID:', entryId);
+        throw new Error('Invalid entry ID');
+      }
+
+      const token = readToken();
+
+      if (!token) {
+        throw new Error('Authentication token missing');
+      }
+
+      const response = await fetch(`/api/passwords/${entryId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      setEntries((prevEntries) =>
+        prevEntries.filter((entry) => entry.entryId !== entryId)
+      );
+    } catch (error) {
+      console.error('Failed to delete password:', error);
+      alert(`Failed to delete password: ${error.message}`);
+    }
+  };
+
+  const handleUpdate = async (
+    entryId: number | string | undefined,
+    newPassword: string
+  ) => {
+    try {
+      if (!entryId || !newPassword) {
+        console.error('Invalid entryId or newPassword:', {
+          entryId,
+          newPassword,
+        });
+        throw new Error('Invalid entryId or newPassword');
+      }
+
+      const token = readToken();
+
+      if (!token) {
+        throw new Error('Authentication token missing');
+      }
+
+      const response = await fetch(`/api/passwords/${entryId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `Error ${response.status}: ${
+            errorData.message || response.statusText
+          }`
+        );
+      }
+
+      const updatedPassword = await response.json();
+
+      // trying to re-render immediately
+      setEntries((prevEntries) => {
+        return prevEntries.map((entry) => {
+          if (entry.entryId === updatedPassword.entryId) {
+            return { ...entry, password: updatedPassword.password };
+          }
+          return entry;
+        });
+      });
+
+      alert('Password updated successfully');
+
+      setEditEntry(null);
+    } catch (error) {
+      console.error('Failed to update password:', error);
+      alert(`Failed to update password: ${error.message}`);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-800">
       <Sidebar />
 
       <div className="flex-1 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-200 mb-6">
+        <h1 className="text-2xl font-medium text-gray-900 dark:text-gray-200 mb-6">
           {`Good ${new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, ${
             user?.username || 'User'
           }`}
@@ -122,8 +215,8 @@ export default function Dashboard() {
                 return (
                   <div
                     key={entryKey}
-                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[300px]">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[450px]">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-white truncate">
                       {entry.website}
                     </h2>
                     <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
@@ -131,10 +224,10 @@ export default function Dashboard() {
                     </p>
 
                     <div className="mt-2 flex items-center justify-between bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded-md">
-                      <span className="text-gray-900 dark:text-white font-mono truncate">
+                      <span className=" text-gray-900 dark:text-white font-mono truncate">
                         {entry.password && isVisible
                           ? entry.password
-                          : '••••••••'}
+                          : '••••••••••••'}
                       </span>
                       <button
                         onClick={() => {
@@ -153,6 +246,50 @@ export default function Dashboard() {
                           <FaEye size={18} />
                         )}
                       </button>
+                    </div>
+
+                    <div className="mt-4 flex flex-col space-y-2">
+                      {editEntry?.website === entry.website &&
+                      editEntry.accountUsername === entry.accountUsername ? (
+                        <>
+                          <input
+                            type="text"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="New Password"
+                            className="p-2 bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                          />
+                          <div className="flex justify-between items-center mt-2">
+                            <button
+                              onClick={() => {
+                                handleUpdate(entry.entryId, newPassword);
+                              }}
+                              className="text-gray-300 hover:text-teal-500 text-sm font-medium">
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditEntry(null)}
+                              className="text-red-400 hover:text-red-500 hover:font-semibold text-sm font-medium">
+                              Cancel
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex justify-between items-center space-x-2">
+                            <button
+                              onClick={() => setEditEntry(entry)}
+                              className="text-teal-500 hover:text-teal-300 text-sm">
+                              <FaPencilAlt size={20} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(entry.entryId)}
+                              className="text-red-400 hover:text-red-500 text-sm">
+                              <FaTrashAlt size={20} />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

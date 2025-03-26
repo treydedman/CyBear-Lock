@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: Inter, sans-serif;
+}
+
 /* html.dark {
   background-color: #1f2937;
   color: #f3f4f6;

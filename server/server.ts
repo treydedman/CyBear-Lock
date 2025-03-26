@@ -87,16 +87,16 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
  */
 app.post('/api/auth/sign-in', async (req, res, next) => {
   try {
-    const { identifier, password } = req.body; // Accepts either email or username
+    const { identifier, password } = req.body;
 
     if (!identifier || !password) {
       throw new ClientError(400, 'Email or username and password are required');
     }
 
     const sql = `
-    SELECT "userId", "email", "username", "hashedPassword"
-    FROM "users"
-    WHERE COALESCE("email" = $1, false) OR COALESCE("username" = $1, false);
+    select "userId", "email", "username", "hashedPassword"
+    from "users"
+    where "email" = $1  or "username" = $1;
     `;
 
     const params = [identifier];
@@ -147,7 +147,7 @@ app.get(
       }
 
       const sql = `
-      select "userId", "website", "accountUsername", "encryptedPassword"
+      select "website", "accountUsername", "encryptedPassword"
       from "passwordEntries"
       where "userId" = $1 and "website" = $2 and "accountUsername" = $3
       limit 1;
@@ -208,7 +208,7 @@ app.get('/api/passwords', authMiddleware, async (req, res, next) => {
     if (!userId) throw new ClientError(401, 'Authentication required');
 
     const sql = `
-      select "website", "accountUsername", "encryptedPassword", "category", "tags", "createdAt"
+      select "entryId", "website", "accountUsername", "encryptedPassword", "category", "tags", "createdAt"
       from "passwordEntries"
       where "userId" = $1
       order by "website" asc, "accountUsername" asc;
@@ -223,6 +223,71 @@ app.get('/api/passwords', authMiddleware, async (req, res, next) => {
     next(err);
   }
 });
+
+app.put('/api/passwords/:entryId', authMiddleware, async (req, res, next) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) throw new ClientError(401, 'Authentication required');
+
+    const { entryId } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      throw new ClientError(400, 'Password is required');
+    }
+
+    const encryptedPassword = encrypt(password);
+
+    const sql = `
+      update "passwordEntries"
+      set "encryptedPassword" = $1
+      where "userId" = $2 and "entryId" = $3
+      returning "website", "accountUsername", "updatedAt";
+    `;
+
+    const params = [encryptedPassword, userId, entryId];
+    const result = await db.query(sql, params);
+
+    if (result.rowCount === 0) {
+      throw new ClientError(404, 'Password entry not found');
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete(
+  '/api/passwords/:entryId',
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) throw new ClientError(401, 'Authentication required');
+
+      const entryId = Number(req.params.entryId);
+      if (isNaN(entryId)) throw new ClientError(400, 'Invalid entry ID');
+
+      const sql = `
+      delete from "passwordEntries"
+      where "entryId" = $1 and "userId" = $2
+      returning *;
+    `;
+
+      const params = [entryId, userId];
+      const result = await db.query(sql, params);
+
+      if (result.rowCount === 0) {
+        throw new ClientError(404, 'Password entry not found');
+      }
+
+      res.status(200).json({ message: 'Password entry deleted successfully' });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 /*
  * Handles paths that aren't handled by any other route handler.
