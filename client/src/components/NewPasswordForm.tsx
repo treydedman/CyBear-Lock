@@ -60,7 +60,8 @@ export default function NewPasswordForm({
           value={formData.website}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 block text-sm"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400
+           block text-sm"
         />
       </div>
 
@@ -72,7 +73,8 @@ export default function NewPasswordForm({
           value={formData.username}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 block text-sm"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400
+           block text-sm"
         />
       </div>
 
@@ -84,7 +86,8 @@ export default function NewPasswordForm({
           value={formData.password}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 block text-sm"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400
+           block text-sm"
         />
       </div>
 
