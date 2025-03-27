@@ -11,7 +11,7 @@ const Modal: React.FC<ModalProps> = ({ isVisible, onClose, onConfirm }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-300 p-6 rounded-lg shadow-lg max-w-lg w-full">
+      <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-200 p-6 rounded-lg shadow-lg max-w-lg w-full">
         <h3 className="text-xl font-semibold">
           Are you sure you want to delete this entry?
         </h3>

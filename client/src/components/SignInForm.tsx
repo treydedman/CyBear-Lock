@@ -7,9 +7,6 @@ type AuthData = {
   token: string;
 };
 
-/**
- * Form to sign in a user
- */
 export function SignInForm() {
   const { handleSignIn } = useUser();
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +56,7 @@ export function SignInForm() {
               name="identifier"
               placeholder="Email or Username"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-sm"
             />
           </div>
 
@@ -69,7 +66,7 @@ export function SignInForm() {
               name="password"
               placeholder="Password"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-sm"
             />
           </div>
 

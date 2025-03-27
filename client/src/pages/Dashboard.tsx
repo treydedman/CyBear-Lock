@@ -16,7 +16,6 @@ type PasswordEntry = {
 };
 
 export default function Dashboard() {
-  // console.log('component loaded');
   const { user } = useContext(UserContext);
   const [entries, setEntries] = useState<PasswordEntry[]>([]);
   // console.log('entries', entries);
@@ -51,7 +50,7 @@ export default function Dashboard() {
       const entries = await res.json();
       setEntries(entries);
 
-      // Reset visiblePasswords explicitly after fetch
+      // Reset visiblePasswords after fetch
       setVisiblePasswords({});
     } catch (e) {
       console.error('Failed to fetch entries:', e);
@@ -141,13 +140,13 @@ export default function Dashboard() {
 
   // Trigger delete with confirmation modal
   const handleDeleteClick = (entryId: number) => {
-    setEntryToDelete(entryId); // Store entryId to delete
-    setIsModalVisible(true); // Show the modal to confirm deletion
+    setEntryToDelete(entryId);
+    setIsModalVisible(true);
   };
 
   const handleCloseModal = () => {
-    setIsModalVisible(false); // Close modal if cancelled
-    setEntryToDelete(null); // Clear the entry ID
+    setIsModalVisible(false);
+    setEntryToDelete(null);
   };
 
   const handleUpdate = async (
@@ -186,13 +185,13 @@ export default function Dashboard() {
       // After updating, re-fetch entries
       await fetchEntries();
 
-      // Immediately set visibility to true for updated entry
+      // Set visibility to true for updated entry
       const updatedEntry = entries.find((entry) => entry.entryId === entryId);
       if (updatedEntry) {
         const entryKey = `${updatedEntry.website}-${updatedEntry.accountUsername}`;
         setVisiblePasswords({ [entryKey]: true });
 
-        // Re-fetch decrypted password immediately to prevent extra clicks
+        // Re-fetch decrypted password
         await fetchDecryptedPassword(
           updatedEntry.website,
           updatedEntry.accountUsername
@@ -317,7 +316,6 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-      {/* Modal */}
       {isModalVisible && (
         <Modal
           isVisible={isModalVisible}

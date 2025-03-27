@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from './useUser';
 import { FiHome, FiSettings, FiLogOut, FiKey } from 'react-icons/fi';
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { handleSignOut } = useUser();
+  const navigate = useNavigate();
 
   return (
     <aside
@@ -39,7 +42,12 @@ export default function Sidebar() {
         </Link>
       </nav>
 
-      <button className="flex items-center space-x-3 p-3 rounded-lg text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-800 transition">
+      <button
+        onClick={() => {
+          handleSignOut();
+          navigate('/auth/sign-in');
+        }}
+        className="flex items-center space-x-3 p-3 rounded-lg text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-800 transition">
         <FiLogOut className="text-xl" />
         {!isCollapsed && <span>Sign Out</span>}
       </button>
