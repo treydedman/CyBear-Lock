@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: Inter, sans-serif;
+}
+
+/* html.dark {
+  background-color: #1f2937;
+  color: #f3f4f6;
+} */
+
+/* /* Light Mode (Default) */
+
+/* body {
+  @apply bg-gray-100 text-gray-900;
+} */
+
+/* Dark Mode */
+
+/* .dark body {
+  @apply bg-gray-800 text-gray-100;
+} */
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

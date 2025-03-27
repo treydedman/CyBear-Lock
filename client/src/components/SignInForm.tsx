@@ -7,9 +7,6 @@ type AuthData = {
   token: string;
 };
 
-/**
- * Form that signs in a user.
- */
 export function SignInForm() {
   const { handleSignIn } = useUser();
   const [isLoading, setIsLoading] = useState(false);
@@ -40,9 +37,10 @@ export function SignInForm() {
       setIsLoading(false);
     }
   }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-sm bg-white p-8 rounded-2xl shadow-lg">
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-sm sm:max-w-sm md:max-w-sm lg:max-w-sm bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
         <h2 className="text-3xl font-semibold text-center text-blue-950">
           Sign In
         </h2>
@@ -55,10 +53,10 @@ export function SignInForm() {
           <div>
             <input
               type="text"
-              name="username"
-              placeholder="Username"
+              name="identifier"
+              placeholder="Email or Username"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-sm"
             />
           </div>
 
@@ -68,7 +66,7 @@ export function SignInForm() {
               name="password"
               placeholder="Password"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-sm"
             />
           </div>
 
