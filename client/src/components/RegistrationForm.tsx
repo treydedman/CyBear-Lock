@@ -157,7 +157,7 @@ export function RegistrationForm() {
                 )}`}
               />
               <p className="mt-1 text-medium text-center text-gray-700 font-semibold">
-                {getStrengthText(passwordStrength)}
+                {getStrengthText(passwordStrength ?? 0)}
               </p>
               {passwordFeedback && (
                 <pre className="mt-2 text-xs text-red-500 font-sans">

@@ -127,14 +127,14 @@ export default function Dashboard() {
       }
 
       alert('Password entry deleted successfully');
-      await fetchEntries(); // Re-fetch entries after deleting
+      await fetchEntries();
 
-      // Close the modal and clear entryToDelete
       setIsModalVisible(false);
       setEntryToDelete(null);
-    } catch (error) {
-      console.error('Failed to delete password entry:', error);
-      alert(`Failed to delete password entry: ${error.message}`);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'An unknown error occurred';
+      alert(`Error deleting password: ${errorMessage}`);
     }
   };
 
@@ -197,9 +197,10 @@ export default function Dashboard() {
           updatedEntry.accountUsername
         );
       }
-    } catch (error) {
-      console.error('Failed to update password:', error);
-      alert(`Failed to update password: ${error.message}`);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'An unknown error occurred';
+      alert(`Error updating password: ${errorMessage}`);
     }
   };
 
