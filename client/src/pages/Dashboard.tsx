@@ -230,7 +230,7 @@ export default function Dashboard() {
                 return (
                   <div
                     key={entryKey}
-                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[450px]">
+                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[500px]">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-white truncate">
                       {entry.website}
                     </h2>
