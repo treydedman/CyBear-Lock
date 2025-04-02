@@ -14,9 +14,10 @@ export default function App() {
         <Header />
         <div className="min-h-screen bg-gray-100">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<SignInForm />} />
             <Route path="/auth/sign-in" element={<SignInForm />} />
             <Route path="/auth/sign-up" element={<RegistrationForm />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/new-password" element={<NewEntry />} />
           </Routes>
         </div>

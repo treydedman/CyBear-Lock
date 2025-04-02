@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars -- Remove when used */
 import 'dotenv/config';
 import express from 'express';
 import pg from 'pg';
@@ -12,11 +11,6 @@ type User = {
   email: string;
   username: string;
   hashedPassword: string;
-};
-type Auth = {
-  username: string;
-  email?: string;
-  password: string;
 };
 
 const db = new pg.Pool({
@@ -54,7 +48,6 @@ app.get('/api/hello', (req, res) => {
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
     const { email, username, password } = req.body;
-    console.log('Request Body:', req.body);
     if (!email || !username || !password) {
       throw new ClientError(400, 'Email, username and password are required');
     }
@@ -125,9 +118,26 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
   }
 });
 
+// Guest sign-in hard coded route
+app.post('/api/auth/guest-sign-in', async (req, res, next) => {
+  try {
+    const guestUser = {
+      userId: 1,
+      email: null,
+      username: 'Guest',
+    };
+
+    const token = jwt.sign(guestUser, hashKey, { expiresIn: '1h' });
+
+    res.status(200).json({ token, user: guestUser });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /**
  * RETRIEVE PASSWORD ENTRY ROUTE
- * - Fetches a specific stored password for an authenticated user
+ * - Fetches stored passwords for an authenticated user
  * - Requires the website/service name and account username as parameters
  * - Decrypts the stored password before returning it
  * - Ensures only the authenticated user can retrieve their own stored credentials
@@ -138,7 +148,6 @@ app.get(
   async (req, res, next) => {
     try {
       const userId = req.user?.userId;
-      console.log(req.user);
       if (!userId) throw new ClientError(401, 'Authentication required');
 
       const { website, accountUsername } = req.params;
@@ -173,11 +182,10 @@ app.get(
 );
 
 app.post('/api/passwords', authMiddleware, async (req, res, next) => {
-  console.log('/api/password-post');
   try {
     const userId = req.user?.userId;
     if (!userId) throw new ClientError(401, 'authentication required');
-    console.log('req.body', req.body);
+
     const { website, username, password } = req.body;
     if (!website || !username || !password) {
       throw new ClientError(400, 'credentials are required');
@@ -202,9 +210,7 @@ app.post('/api/passwords', authMiddleware, async (req, res, next) => {
 
 app.get('/api/passwords', authMiddleware, async (req, res, next) => {
   try {
-    console.log('api password hit');
     const userId = req.user?.userId;
-    console.log('user', req.user);
     if (!userId) throw new ClientError(401, 'Authentication required');
 
     const sql = `
@@ -215,9 +221,7 @@ app.get('/api/passwords', authMiddleware, async (req, res, next) => {
     `;
 
     const params = [userId];
-    console.log('user', [userId]);
     const result = await db.query(sql, params);
-    console.log('result', result);
     res.status(200).json(result.rows);
   } catch (err) {
     next(err);
