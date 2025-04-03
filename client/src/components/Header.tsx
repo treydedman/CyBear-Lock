@@ -22,7 +22,7 @@ const Header = () => {
   return (
     <header className="w-full bg-gray-700 px-6 py-4 flex items-center justify-between">
       <Link to="/" className="flex items-center">
-        <img src="/CyBear Lock.svg" alt="Logo" className="h-16 w-auto" />
+        <img src="/cybear-lock.svg" alt="Logo" className="h-16 w-auto" />
       </Link>
 
       <button
