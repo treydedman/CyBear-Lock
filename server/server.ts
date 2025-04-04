@@ -118,23 +118,6 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
   }
 });
 
-// Guest sign-in hard coded route
-app.post('/api/auth/guest-sign-in', async (req, res, next) => {
-  try {
-    const guestUser = {
-      userId: 1,
-      email: null,
-      username: 'Guest',
-    };
-
-    const token = jwt.sign(guestUser, hashKey, { expiresIn: '1h' });
-
-    res.status(200).json({ token, user: guestUser });
-  } catch (err) {
-    next(err);
-  }
-});
-
 /**
  * RETRIEVE PASSWORD ENTRY ROUTE
  * - Fetches stored passwords for an authenticated user
@@ -262,6 +245,7 @@ app.put('/api/passwords/:entryId', authMiddleware, async (req, res, next) => {
   }
 });
 
+// Password entry delete
 app.delete(
   '/api/passwords/:entryId',
   authMiddleware,
@@ -287,6 +271,68 @@ app.delete(
       }
 
       res.status(200).json({ message: 'Password entry deleted successfully' });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.post('/api/auth/reset-password', authMiddleware, async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      throw new ClientError(400, 'Password is required');
+    }
+
+    const hashedPassword = await argon2.hash(password);
+
+    const sql = `
+      update "users"
+      set "hashedPassword" = $1
+      where "userId" = $2
+      returning "userId", "username", "email", "createdAt";
+    `;
+
+    if (!req.user) {
+      throw new ClientError(401, 'Unauthorized');
+    }
+
+    const params = [hashedPassword, req.user.userId];
+
+    const result = await db.query(sql, params);
+
+    if (!result.rows.length) {
+      throw new ClientError(404, 'User not found');
+    }
+
+    res.json({
+      message: 'Password updated successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Account or user delete route
+app.delete(
+  '/api/auth/delete-account',
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        throw new ClientError(401, 'Unauthorized');
+      }
+
+      // Delete all password entries first
+      await db.query('DELETE FROM "passwordEntries" WHERE "userId" = $1', [
+        userId,
+      ]);
+
+      // Delete user account
+      await db.query('DELETE FROM "users" WHERE "userId" = $1', [userId]);
+
+      res.status(200).json({ message: 'Account deleted successfully' });
     } catch (err) {
       next(err);
     }

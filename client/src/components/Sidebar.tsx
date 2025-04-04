@@ -36,7 +36,7 @@ export default function Sidebar() {
 
         <Link
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          to="/settings">
+          to="/profile">
           <FiSettings className="text-xl" />
           {!isCollapsed && <span>Profile</span>}
         </Link>

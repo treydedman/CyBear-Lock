@@ -41,19 +41,24 @@ export function SignInForm() {
   async function handleGuestSignIn() {
     try {
       setIsLoading(true);
-      const req = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application;json' },
+      const guestCredentials = {
+        username: 'Guest',
+        password: 'guestPass123$',
       };
 
-      const res = await fetch('/api/auth/guest-sign-in', req);
+      const req = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(guestCredentials),
+      };
+
+      const res = await fetch('/api/auth/sign-in', req);
       if (!res.ok) {
         throw new Error(`Guest sign-in failed: ${res.status}`);
       }
 
       const { user, token } = (await res.json()) as AuthData;
       handleSignIn(user, token);
-
       navigate('/dashboard');
     } catch (err) {
       alert(`Error signing in as guest: ${err}`);
