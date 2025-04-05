@@ -58,7 +58,7 @@ export function ProfilePage() {
 
   async function handleDeleteAccount() {
     if (user?.username === 'Guest') {
-      alert('Guest users cannot delete their account.');
+      alert('Guest users cannot delete this account.');
       return;
     }
 

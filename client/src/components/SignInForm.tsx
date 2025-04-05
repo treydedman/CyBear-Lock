@@ -42,7 +42,7 @@ export function SignInForm() {
     try {
       setIsLoading(true);
       const guestCredentials = {
-        username: 'Guest',
+        identifier: 'Guest',
         password: 'guestPass123$',
       };
 
