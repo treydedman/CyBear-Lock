@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`relative h-screen transition-all duration-400 ${
+      className={`relative min-h-screen transition-all duration-400 ${
         isCollapsed ? 'w-16' : 'w-60'
       } bg-white dark:bg-gray-700 border-r border-gray-300 dark:border-gray-700 shadow-md mt-20 rounded-xl`}>
       <button
@@ -31,7 +31,7 @@ export default function Sidebar() {
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           to="/new-password">
           <FiKey className="text-xl" />
-          {!isCollapsed && <span>New Password</span>}
+          {!isCollapsed && <span>Add Password</span>}
         </Link>
 
         <Link
