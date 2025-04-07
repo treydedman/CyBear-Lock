@@ -30,9 +30,38 @@ export function SignInForm() {
       const { user, token } = (await res.json()) as AuthData;
       handleSignIn(user, token);
 
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       alert(`Error signing in: ${err}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleGuestSignIn() {
+    try {
+      setIsLoading(true);
+      const guestCredentials = {
+        identifier: 'Guest',
+        password: 'guestPass123$',
+      };
+
+      const req = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(guestCredentials),
+      };
+
+      const res = await fetch('/api/auth/sign-in', req);
+      if (!res.ok) {
+        throw new Error(`Guest sign-in failed: ${res.status}`);
+      }
+
+      const { user, token } = (await res.json()) as AuthData;
+      handleSignIn(user, token);
+      navigate('/dashboard');
+    } catch (err) {
+      alert(`Error signing in as guest: ${err}`);
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +104,17 @@ export function SignInForm() {
             className="w-full px-4 py-2 text-white bg-blue-950 rounded-lg hover:bg-blue-900 transition disabled:bg-gray-400"
             disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign In'}
+          </button>
+
+          <p className="text-center text-medium text-gray-500 leading-none">
+            or
+          </p>
+
+          <button
+            type="button"
+            className="w-full px-4 py-2 text-white bg-blue-950 rounded-lg hover:bg-blue-900 transition disabled:bg-gray-400"
+            onClick={handleGuestSignIn}>
+            Continue as Guest
           </button>
         </form>
 

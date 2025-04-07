@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars -- Remove when used */
 import 'dotenv/config';
 import express from 'express';
 import pg from 'pg';
@@ -12,11 +11,6 @@ type User = {
   email: string;
   username: string;
   hashedPassword: string;
-};
-type Auth = {
-  username: string;
-  email?: string;
-  password: string;
 };
 
 const db = new pg.Pool({
@@ -54,7 +48,6 @@ app.get('/api/hello', (req, res) => {
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
     const { email, username, password } = req.body;
-    console.log('Request Body:', req.body);
     if (!email || !username || !password) {
       throw new ClientError(400, 'Email, username and password are required');
     }
@@ -127,7 +120,7 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
 
 /**
  * RETRIEVE PASSWORD ENTRY ROUTE
- * - Fetches a specific stored password for an authenticated user
+ * - Fetches stored passwords for an authenticated user
  * - Requires the website/service name and account username as parameters
  * - Decrypts the stored password before returning it
  * - Ensures only the authenticated user can retrieve their own stored credentials
@@ -138,7 +131,6 @@ app.get(
   async (req, res, next) => {
     try {
       const userId = req.user?.userId;
-      console.log(req.user);
       if (!userId) throw new ClientError(401, 'Authentication required');
 
       const { website, accountUsername } = req.params;
@@ -173,11 +165,10 @@ app.get(
 );
 
 app.post('/api/passwords', authMiddleware, async (req, res, next) => {
-  console.log('/api/password-post');
   try {
     const userId = req.user?.userId;
     if (!userId) throw new ClientError(401, 'authentication required');
-    console.log('req.body', req.body);
+
     const { website, username, password } = req.body;
     if (!website || !username || !password) {
       throw new ClientError(400, 'credentials are required');
@@ -202,9 +193,7 @@ app.post('/api/passwords', authMiddleware, async (req, res, next) => {
 
 app.get('/api/passwords', authMiddleware, async (req, res, next) => {
   try {
-    console.log('api password hit');
     const userId = req.user?.userId;
-    console.log('user', req.user);
     if (!userId) throw new ClientError(401, 'Authentication required');
 
     const sql = `
@@ -215,9 +204,7 @@ app.get('/api/passwords', authMiddleware, async (req, res, next) => {
     `;
 
     const params = [userId];
-    console.log('user', [userId]);
     const result = await db.query(sql, params);
-    console.log('result', result);
     res.status(200).json(result.rows);
   } catch (err) {
     next(err);
@@ -258,6 +245,7 @@ app.put('/api/passwords/:entryId', authMiddleware, async (req, res, next) => {
   }
 });
 
+// Password entry delete
 app.delete(
   '/api/passwords/:entryId',
   authMiddleware,
@@ -283,6 +271,68 @@ app.delete(
       }
 
       res.status(200).json({ message: 'Password entry deleted successfully' });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.post('/api/auth/reset-password', authMiddleware, async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      throw new ClientError(400, 'Password is required');
+    }
+
+    const hashedPassword = await argon2.hash(password);
+
+    const sql = `
+      update "users"
+      set "hashedPassword" = $1
+      where "userId" = $2
+      returning "userId", "username", "email", "createdAt";
+    `;
+
+    if (!req.user) {
+      throw new ClientError(401, 'Unauthorized');
+    }
+
+    const params = [hashedPassword, req.user.userId];
+
+    const result = await db.query(sql, params);
+
+    if (!result.rows.length) {
+      throw new ClientError(404, 'User not found');
+    }
+
+    res.json({
+      message: 'Password updated successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Account or user delete route
+app.delete(
+  '/api/auth/delete-account',
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        throw new ClientError(401, 'Unauthorized');
+      }
+
+      // Delete all password entries first
+      await db.query('DELETE FROM "passwordEntries" WHERE "userId" = $1', [
+        userId,
+      ]);
+
+      // Delete user account
+      await db.query('DELETE FROM "users" WHERE "userId" = $1', [userId]);
+
+      res.status(200).json({ message: 'Account deleted successfully' });
     } catch (err) {
       next(err);
     }

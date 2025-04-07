@@ -15,7 +15,7 @@ export default function NewPasswordPage() {
           Securely store a new password entry
         </p>
 
-        <NewPasswordForm onEntryAdded={() => navigate('/')} />
+        <NewPasswordForm onEntryAdded={() => navigate('/dashboard')} />
       </div>
     </div>
   );

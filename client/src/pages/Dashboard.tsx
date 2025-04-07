@@ -18,7 +18,6 @@ type PasswordEntry = {
 export default function Dashboard() {
   const { user } = useContext(UserContext);
   const [entries, setEntries] = useState<PasswordEntry[]>([]);
-  // console.log('entries', entries);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<{
@@ -155,7 +154,7 @@ export default function Dashboard() {
   ) => {
     try {
       if (!entryId || !newPassword) {
-        throw new Error('Invalid entryId or newPassword');
+        throw new Error('Invalid entry or password');
       }
       const token = readToken();
       if (!token) {

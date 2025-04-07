@@ -1,26 +1,17 @@
--- Use SQL insert statements to add any
--- starting/dummy data to your database tables
+-- Insert Guest User
+INSERT INTO "users" ("email", "username", "hashedPassword", "createdAt")
+VALUES (
+  'guest@example.com',
+  'Guest',
+  '$argon2id$v=19$m=65536,t=3,p=4$PM5uRdmKQKpekeEroT5WLg$1px0Sid/LzwGZewfa/W/Whb8UkNf0E0kiX6pFTMoJr4',
+  NOW()
+);
 
--- EXAMPLE:
-
---  insert into "todos"
---    ("task", "isCompleted")
---    values
---      ('Learn to code', false),
---      ('Build projects', false),
---      ('Get a job', false);
-
--- Insert Users
-INSERT INTO "users" ("userId", "email", "username", "hashedPassword", "createdAt") VALUES
-(1, 'john.doe@example.com', 'johndoe', '$2b$12$abcdefghijABCDEFGHIJabcdefghijABCDEFGHIJabcdefghij', NOW()),
-(2, 'jane.smith@example.com', 'janesmith', '$2b$12$klmnopqrstKLMNOPQRSTklmnopqrstKLMNOPQRSTklmnopqrst', NOW()),
-(3, 'alex.taylor@example.com', 'alextaylor', '$2b$12$uvwxyzUVWXyzUVWXYZuvwxyzUVWXYZuvwxyzUVWXYZ', NOW());
-
--- Insert Password Entries
-INSERT INTO "passwordEntries" ("entryId", "userId", "website", "accountUsername", "encryptedPassword", "category", "tags", "createdAt", "updatedAt", "deletedAt") VALUES
-(1, 1, 'google.com', 'johndoe', 'ENCRYPTED_PASSWORD_1', 'Personal', 'email, search, google', NOW(), NOW(), NULL),
-(2, 1, 'amazon.com', 'johndoe123', 'ENCRYPTED_PASSWORD_2', 'Shopping', 'shopping, e-commerce', NOW(), NOW(), NULL),
-(3, 2, 'linkedin.com', 'janesmith', 'ENCRYPTED_PASSWORD_3', 'Work', 'networking, work, social', NOW(), NOW(), NULL),
-(4, 2, 'github.com', 'janesmith_dev', 'ENCRYPTED_PASSWORD_4', 'Work', 'development, coding, git', NOW(), NOW(), NULL),
-(5, 3, 'steam.com', 'alextaylor99', 'ENCRYPTED_PASSWORD_5', 'Gaming', 'games, steam, entertainment', NOW(), NOW(), NULL),
-(6, 3, 'paypal.com', 'alext_finance', 'ENCRYPTED_PASSWORD_6', 'Finance', 'banking, money, transactions', NOW(), NOW(), NULL);
+-- Insert Guest User Password Entries
+INSERT INTO "passwordEntries" (
+  "userId", "website", "accountUsername", "encryptedPassword"
+  )
+VALUES
+(1, 'github.com', 'KeepPushing', 'U2FsdGVkX1++jrQjeQFAbvOpfGV6herz3A7g/Kh2o+4='),
+(1, 'canva.com', 'AlmostOriginal', 'U2FsdGVkX18Fa33ZTlDlMPVC+YTRSP4fTI2mwLhr9sk='),
+(1, 'indeed.com', 'HireMePls', 'U2FsdGVkX18jBkaSuirZTz8PKd5FgHMF8Xd3huGB9mY=');
