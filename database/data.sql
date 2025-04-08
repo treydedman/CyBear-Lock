@@ -12,6 +12,6 @@ INSERT INTO "passwordEntries" (
   "userId", "website", "accountUsername", "encryptedPassword"
   )
 VALUES
-(1, 'github.com', 'KeepPushing', 'U2FsdGVkX1++jrQjeQFAbvOpfGV6herz3A7g/Kh2o+4='),
-(1, 'canva.com', 'AlmostOriginal', 'U2FsdGVkX18Fa33ZTlDlMPVC+YTRSP4fTI2mwLhr9sk='),
-(1, 'indeed.com', 'HireMePls', 'U2FsdGVkX18jBkaSuirZTz8PKd5FgHMF8Xd3huGB9mY=');
+(1, 'github.com', 'KeepPushing', 'lWjOiDe5Z7743wqsmX+6tw=='),
+(1, 'canva.com', 'AlmostOriginal', 'Ahw5lGfYxEZF/2PnnrDeNA=='),
+(1, 'indeed.com', 'HireMePls', 'fFdT6hOq2yKv2Z5xYx1K4Q==');
