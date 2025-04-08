@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { readUser, readToken } from './lib/data';
 import { RegistrationForm } from './components/RegistrationForm';
 import { SignInForm } from './components/SignInForm';
 import { UserProvider } from './components/UserContext';
@@ -9,6 +11,15 @@ import { Route, Routes } from 'react-router-dom';
 import './App.css';
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    readUser();
+    readToken();
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) return null;
   return (
     <>
       <UserProvider>
