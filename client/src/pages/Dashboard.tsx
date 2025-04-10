@@ -278,7 +278,7 @@ export default function Dashboard() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="New Password"
-                            className="p-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                            className="p-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
                           />
                           <div className="flex justify-between items-center mt-2">
                             <button

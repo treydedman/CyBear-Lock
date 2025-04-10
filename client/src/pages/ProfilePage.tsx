@@ -104,7 +104,7 @@ export function ProfilePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* User Info Card */}
-          <div className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[500px]">
+          <div className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md border-none dark:border-gray-700 w-full max-w-[500px]">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Account Info
             </h2>
@@ -117,7 +117,7 @@ export function ProfilePage() {
           </div>
 
           {/* Password Reset Form */}
-          <div className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[500px]">
+          <div className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md border-none dark:border-gray-700 w-full max-w-[500px]">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Reset Password
             </h2>
@@ -134,7 +134,7 @@ export function ProfilePage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="New Password"
                 required
-                className="w-full p-2 bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="w-full p-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md text-gray-500 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-200"
               />
 
               <input
@@ -143,7 +143,7 @@ export function ProfilePage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm Password"
                 required
-                className="w-full p-2 bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="w-full p-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md text-gray-500 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-200"
               />
 
               <button
@@ -156,7 +156,7 @@ export function ProfilePage() {
           </div>
 
           {/* Delete Account Card */}
-          <div className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[500px]">
+          <div className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md border-none dark:border-gray-700 w-full max-w-[500px]">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Danger Zone
             </h2>
