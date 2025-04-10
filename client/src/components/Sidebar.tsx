@@ -12,10 +12,10 @@ export default function Sidebar() {
     <aside
       className={`relative min-h-screen transition-all duration-400 ${
         isCollapsed ? 'w-16' : 'w-60'
-      } bg-white dark:bg-gray-700 border-r border-gray-300 dark:border-gray-700 shadow-md mt-20 rounded-xl`}>
+      } bg-white dark:bg-gray-700 border-r border-gray-100 dark:border-gray-700 shadow-md mt-20 rounded-xl`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-300 rounded-full text-gray-300 hover:text-gray-900 dark:hover:text-teal-500 transition">
+        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-500 dark:border-gray-400 rounded-full text-gray-500 dark:text-gray-400 hover:text-teal-500 dark:hover:text-teal-500 transition">
         {isCollapsed ? '→' : '←'}
       </button>
 

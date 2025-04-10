@@ -229,7 +229,7 @@ export default function Dashboard() {
                 return (
                   <div
                     key={entryKey}
-                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border dark:border-gray-700 w-full max-w-[500px]">
+                    className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md border-white dark:border-gray-700 w-full max-w-[500px]">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-white truncate">
                       {entry.website}
                     </h2>
@@ -237,7 +237,14 @@ export default function Dashboard() {
                       Username: {entry.accountUsername}
                     </p>
 
-                    <div className="mt-2 flex items-center justify-between bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded-md">
+                    <div
+                      className="mt-2 flex items-center justify-between
+                      bg-gray-100 dark:bg-gray-600
+                      border border-gray-300 dark:border-transparent
+                      rounded-lg
+                      focus:outline-none
+                      focus:ring-1 focus:ring-gray-400 dark:focus:ring-transparent
+                      px-2 py-1">
                       <span className=" text-gray-900 dark:text-white font-mono truncate">
                         {entry.password && isVisible
                           ? entry.password
@@ -271,14 +278,14 @@ export default function Dashboard() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="New Password"
-                            className="p-2 bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                            className="p-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                           />
                           <div className="flex justify-between items-center mt-2">
                             <button
                               onClick={() => {
                                 handleUpdate(entry.entryId, newPassword);
                               }}
-                              className="text-gray-300 hover:text-teal-500 text-sm font-medium">
+                              className="text-gray-600 dark:text-gray-300 hover:text-teal-500 text-sm font-medium">
                               Save
                             </button>
                             <button
