@@ -51,7 +51,7 @@ export default function NewPasswordForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 flex flex-col space-y-6">
+    <form onSubmit={handleSubmit} className="mt-8 flex flex-col space-y-6">
       <div>
         <input
           type="text"
@@ -60,8 +60,7 @@ export default function NewPasswordForm({
           value={formData.website}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400
-           block text-sm"
+          className="w-full p-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-200"
         />
       </div>
 
@@ -73,8 +72,7 @@ export default function NewPasswordForm({
           value={formData.username}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400
-           block text-sm"
+          className="w-full p-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-200"
         />
       </div>
 
@@ -86,8 +84,7 @@ export default function NewPasswordForm({
           value={formData.password}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400
-           block text-sm"
+          className="w-full p-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-200"
         />
       </div>
 
@@ -96,7 +93,7 @@ export default function NewPasswordForm({
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full px-4 py-2 text-white bg-blue-950 rounded-lg hover:bg-blue-900 transition disabled:bg-gray-400">
+        className="w-full bg-blue-950 text-white py-2 rounded-md hover:bg-teal-500 transition disabled:bg-gray-400">
         {isLoading ? 'Saving...' : 'Save Password'}
       </button>
     </form>

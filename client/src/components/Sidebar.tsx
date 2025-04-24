@@ -15,7 +15,7 @@ export default function Sidebar() {
       } bg-white dark:bg-gray-700 border-r border-gray-100 dark:border-gray-700 shadow-md mt-20 rounded-xl`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-500 dark:border-gray-400 rounded-full text-gray-500 dark:text-gray-400 hover:text-teal-500 dark:hover:text-teal-500 transition">
+        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-gray-100 dark:bg-gray-800 hover:bg-teal-300 dark:hover:bg-teal-500 dark:hover:text-gray-800 border border-gray-500 dark:border-gray-400 rounded-full text-gray-500 dark:text-gray-400">
         {isCollapsed ? '→' : '←'}
       </button>
 

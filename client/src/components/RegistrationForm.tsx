@@ -32,12 +32,12 @@ export function RegistrationForm() {
     const passwordConditions = [
       hasUpperCase
         ? ''
-        : 'Password must contain at least one uppercase letter.',
-      hasNumber ? '' : 'Password must contain at least one number.',
+        : 'Password should contain at least one uppercase letter.',
+      hasNumber ? '' : 'Password should contain at least one number.',
       hasSpecialChar
         ? ''
-        : 'Password must contain at least one special character.',
-      isLongEnough ? '' : 'Password must be at least 8 characters long.',
+        : 'Password should contain at least one special character.',
+      isLongEnough ? '' : 'Password should be at least 8 characters long.',
     ].filter(Boolean);
 
     setPasswordFeedback(passwordConditions.join('\n'));
@@ -78,6 +78,8 @@ export function RegistrationForm() {
 
   // Password strength display
   const getStrengthText = (score: number) => {
+    if (!password) return '';
+
     switch (score) {
       case 0:
         return 'Very Weak';
