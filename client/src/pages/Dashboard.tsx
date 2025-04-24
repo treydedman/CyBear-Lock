@@ -244,7 +244,7 @@ export default function Dashboard() {
                       rounded-lg
                       focus:outline-none
                       focus:ring-1 focus:ring-gray-400 dark:focus:ring-transparent
-                      px-2 py-1">
+                      p-2">
                       <span className=" text-gray-900 dark:text-white font-mono truncate">
                         {entry.password && isVisible
                           ? entry.password
